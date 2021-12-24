@@ -7,15 +7,24 @@
        str/split-lines
        (map #(Integer/parseInt %))))
 
-(defn day1
+(defn part1
   [input]
   (->> input
       (partition 2 1)
       (filter #(< (first %) (second %)))
       count))
 
+(defn part2
+  [input]
+  (->> input
+       (partition 3 1)
+       (map #(apply + %))
+       part1))
+
 (comment
 
-  (day1 input)
+  (part1 input);; => 1390
+
+  (part2 input)
 
   ,)
