@@ -6,28 +6,39 @@
       (slurp $)
       (str/trim $)
       (str/split $ #",")
-      (map #(Integer/parseInt %) $)))
+      (map #(Integer/parseInt %) $)
+      (frequencies $)))
 
 (defn update-fish-lifetimes
-  [lifetimes]
-  (let [decreased-lifetimes (map dec lifetimes)
-        num-to-spawn (->> decreased-lifetimes
-                          (filter #(= -1 %))
-                          count)
-        spawned-lifetimes (concat decreased-lifetimes (repeat num-to-spawn 8))
-        remove-spawned-lifetimes (remove #(= -1 %) spawned-lifetimes)
-        respanwed-lifetimes (concat remove-spawned-lifetimes (repeat num-to-spawn 6))]
-       respanwed-lifetimes))
+  [initial-lifetimes]
+  (let [decreased-lifetimes (->> initial-lifetimes
+                                 (map (fn [[k v]] [(dec' k) v]))
+                                 (into {}))
+        num-to-spawn (get decreased-lifetimes -1 0)]
+    (-> decreased-lifetimes
+        (assoc 8 num-to-spawn)
+        (update 6 (fnil #(+ num-to-spawn %) 0))
+        (dissoc -1))))
+
+(defn calc-population-after-n-days
+  [initial-fish n-days]
+  (as-> initial-fish $
+      (iterate update-fish-lifetimes $)
+      (nth $ n-days)
+      (reduce (fn [accum [_ v]] (+' accum v)) 0 $)))
 
 (defn part1
   [input]
-  (as-> input $
-      (iterate update-fish-lifetimes $)
-      (nth $ 80)
-      (count $)))
+  (calc-population-after-n-days input 80))
+
+(defn part2
+  [input]
+  (calc-population-after-n-days input 256))
 
 (comment
 
   (part1 input);; => 358214
+
+  (part2 input);; => 1622533344325
 
   ,)
