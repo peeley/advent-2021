@@ -31,6 +31,6 @@
 
 (comment
 
-  (part1 output-values)
+  (part1 output-values);; => 390
 
   ,)
